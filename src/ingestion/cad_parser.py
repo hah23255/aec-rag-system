@@ -5,10 +5,11 @@ Extracts metadata, text, and entities from CAD files (DWG/DXF).
 Uses ezdxf library for parsing.
 """
 
-from typing import Dict, Any, List, Optional
-from pathlib import Path
-import structlog
 from dataclasses import dataclass
+from pathlib import Path
+from typing import Optional
+
+import structlog
 
 logger = structlog.get_logger(__name__)
 
@@ -24,9 +25,9 @@ class CADMetadata:
     title: Optional[str] = None
     scale: Optional[str] = None
     date: Optional[str] = None
-    layers: List[str] = None
-    blocks: List[str] = None
-    text_content: List[str] = None
+    layers: list[str] = None
+    blocks: list[str] = None
+    text_content: list[str] = None
     entities_count: int = 0
 
     def __post_init__(self):
@@ -129,7 +130,7 @@ class CADParser:
             logger.error("Failed to parse CAD file", error=str(e), file_path=file_path)
             raise
 
-    def _extract_title_block(self, text_entities: List[str]) -> Dict[str, str]:
+    def _extract_title_block(self, text_entities: list[str]) -> dict[str, str]:
         """
         Extract title block information from text entities (heuristic).
 

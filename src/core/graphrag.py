@@ -6,9 +6,10 @@ Handles graph construction, entity extraction, and two-stage retrieval.
 """
 
 import asyncio
-from typing import List, Optional, Dict, Any, Tuple
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Any, Optional
+
 import structlog
 
 logger = structlog.get_logger(__name__)
@@ -95,7 +96,7 @@ class AECGraphRAG:
         """Initialize nano-graphrag framework"""
         try:
             from nano_graphrag import GraphRAG, QueryParam
-            from nano_graphrag._llm import OllamaLLM, OllamaEmbedding
+            from nano_graphrag._llm import OllamaEmbedding, OllamaLLM
             from nano_graphrag._storage import NetworkXStorage
 
             # Configure storage backend
@@ -133,9 +134,7 @@ class AECGraphRAG:
 
         except ImportError as e:
             logger.error("Failed to import nano-graphrag", error=str(e))
-            raise RuntimeError(
-                "nano-graphrag not installed. Run: pip install nano-graphrag"
-            ) from e
+            raise RuntimeError("nano-graphrag not installed. Run: pip install nano-graphrag") from e
 
     async def _initialize_linearrag(self) -> None:
         """Initialize LinearRAG framework"""
@@ -144,7 +143,7 @@ class AECGraphRAG:
         await self._initialize_nano_graphrag()
 
     async def insert_document(
-        self, document_text: str, metadata: Optional[Dict[str, Any]] = None
+        self, document_text: str, metadata: Optional[dict[str, Any]] = None
     ) -> str:
         """
         Insert document into graph.
@@ -181,7 +180,7 @@ class AECGraphRAG:
             logger.error("Failed to insert document", error=str(e))
             raise
 
-    def _enrich_document(self, text: str, metadata: Dict[str, Any]) -> str:
+    def _enrich_document(self, text: str, metadata: dict[str, Any]) -> str:
         """
         Enrich document text with structured metadata.
 
@@ -220,7 +219,7 @@ class AECGraphRAG:
         question: str,
         mode: Optional[str] = None,
         top_k: Optional[int] = None,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Query the graph with natural language.
 
@@ -242,9 +241,7 @@ class AECGraphRAG:
             top_k = top_k or self.config.top_k
 
             # Execute query
-            result = await self.rag.aquery(
-                question, param=QueryParam(mode=mode, top_k=top_k)
-            )
+            result = await self.rag.aquery(question, param=QueryParam(mode=mode, top_k=top_k))
 
             logger.info(
                 "Executed query",
@@ -260,7 +257,7 @@ class AECGraphRAG:
             logger.error("Failed to execute query", error=str(e), question=question)
             raise
 
-    async def get_version_history(self, drawing_number: str) -> List[Dict[str, Any]]:
+    async def get_version_history(self, drawing_number: str) -> list[dict[str, Any]]:
         """
         Get version history for a drawing.
 
@@ -276,7 +273,7 @@ class AECGraphRAG:
         # Parse versions from result (would need more sophisticated parsing in production)
         return [{"answer": result["answer"]}]
 
-    async def analyze_impact(self, change_description: str) -> Dict[str, Any]:
+    async def analyze_impact(self, change_description: str) -> dict[str, Any]:
         """
         Analyze impact of a design change.
 
@@ -296,8 +293,8 @@ class AECGraphRAG:
         }
 
     async def check_code_compliance(
-        self, component_id: str, requirements: List[str]
-    ) -> Dict[str, Any]:
+        self, component_id: str, requirements: list[str]
+    ) -> dict[str, Any]:
         """
         Check code compliance for a component.
 
@@ -317,7 +314,7 @@ class AECGraphRAG:
             "compliance_check": result["answer"],
         }
 
-    def get_stats(self) -> Dict[str, Any]:
+    def get_stats(self) -> dict[str, Any]:
         """
         Get GraphRAG statistics.
 

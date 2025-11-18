@@ -5,14 +5,14 @@ REST API for AEC Design Management RAG System.
 Provides endpoints for document management, querying, and graph navigation.
 """
 
-from fastapi import FastAPI, HTTPException, UploadFile, File, Depends
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
-from pydantic import BaseModel, Field
-from typing import List, Optional, Dict, Any
-import structlog
-from pathlib import Path
 from datetime import datetime
+from pathlib import Path
+from typing import Optional
+
+import structlog
+from fastapi import FastAPI, File, HTTPException, UploadFile
+from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel, Field
 
 # Initialize logger
 structlog.configure(
@@ -82,7 +82,7 @@ class HealthResponse(BaseModel):
     status: str
     timestamp: str
     version: str
-    services: Dict[str, str]
+    services: dict[str, str]
 
 
 # =============================================================================
@@ -163,7 +163,8 @@ async def upload_document(file: UploadFile = File(...)):
 
         if file_ext not in supported_types:
             raise HTTPException(
-                status_code=400, detail=f"Unsupported file type: {file_ext}. Supported: {supported_types}"
+                status_code=400,
+                detail=f"Unsupported file type: {file_ext}. Supported: {supported_types}",
             )
 
         # Save file temporarily
@@ -193,7 +194,9 @@ async def upload_document(file: UploadFile = File(...)):
         # TODO: Insert into GraphRAG
         # await graph_rag.insert_document(text, metadata={"id": document_id})
 
-        logger.info("Document uploaded successfully", document_id=document_id, filename=file.filename)
+        logger.info(
+            "Document uploaded successfully", document_id=document_id, filename=file.filename
+        )
 
         return DocumentUploadResponse(
             document_id=document_id,
@@ -313,9 +316,7 @@ async def get_drawing_impacts(drawing_id: str):
                 {"id": "S-203", "discipline": "S", "severity": "major"},
                 {"id": "M-101", "discipline": "M", "severity": "moderate"},
             ],
-            "affected_components": [
-                {"id": "WA-02", "type": "wall", "severity": "minor"}
-            ],
+            "affected_components": [{"id": "WA-02", "type": "wall", "severity": "minor"}],
         }
 
         return {"drawing_id": drawing_id, "impacts": impacts}

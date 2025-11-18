@@ -1,32 +1,32 @@
 """AEC graph schema definitions"""
 
 from .aec_schema import (
-    # Entity types
-    Drawing,
-    Component,
-    Room,
-    Decision,
-    Person,
-    Requirement,
-    Milestone,
-    # Relationship types
-    Supersedes,
-    Affects,
-    Contains,
-    LocatedIn,
-    Requires,
-    ApprovedBy,
-    MadeBy,
-    Modifies,
-    References,
-    SubmittedAt,
-    # Enums
-    DrawingDiscipline,
-    DrawingStatus,
-    ComponentType,
     # Registries
     ENTITY_TYPES,
     RELATIONSHIP_TYPES,
+    Affects,
+    ApprovedBy,
+    Component,
+    ComponentType,
+    Contains,
+    Decision,
+    # Entity types
+    Drawing,
+    # Enums
+    DrawingDiscipline,
+    DrawingStatus,
+    LocatedIn,
+    MadeBy,
+    Milestone,
+    Modifies,
+    Person,
+    References,
+    Requirement,
+    Requires,
+    Room,
+    SubmittedAt,
+    # Relationship types
+    Supersedes,
 )
 
 __all__ = [

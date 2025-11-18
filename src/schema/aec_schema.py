@@ -26,19 +26,20 @@ Relationship Types:
     - SUBMITTED_AT: Drawing submitted at milestone
 """
 
-from dataclasses import dataclass, field, asdict
+import json
+from dataclasses import asdict, dataclass
 from datetime import datetime
 from enum import Enum
-from typing import Dict, List, Optional, Any
-import json
-
+from typing import Any, Optional
 
 # =============================================================================
 # Enumerations
 # =============================================================================
 
+
 class DrawingDiscipline(str, Enum):
     """Architectural/engineering disciplines"""
+
     ARCHITECTURAL = "A"
     STRUCTURAL = "S"
     MECHANICAL = "M"
@@ -51,6 +52,7 @@ class DrawingDiscipline(str, Enum):
 
 class DrawingStatus(str, Enum):
     """Drawing lifecycle status"""
+
     DRAFT = "draft"
     ISSUED = "issued"
     APPROVED = "approved"
@@ -60,6 +62,7 @@ class DrawingStatus(str, Enum):
 
 class ComponentType(str, Enum):
     """Building component categories"""
+
     WALL = "wall"
     DOOR = "door"
     WINDOW = "window"
@@ -76,6 +79,7 @@ class ComponentType(str, Enum):
 # =============================================================================
 # Entity Classes (Nodes)
 # =============================================================================
+
 
 @dataclass
 class Drawing:
@@ -97,6 +101,7 @@ class Drawing:
         description: Long-form description/notes
         embedding_id: Reference to vector embedding
     """
+
     id: str
     drawing_number: str
     version: str
@@ -111,12 +116,12 @@ class Drawing:
     description: Optional[str] = None
     embedding_id: Optional[str] = None
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary with datetime serialization"""
         data = asdict(self)
-        data['date'] = self.date.isoformat()
-        data['discipline'] = self.discipline.value
-        data['status'] = self.status.value
+        data["date"] = self.date.isoformat()
+        data["discipline"] = self.discipline.value
+        data["status"] = self.status.value
         return data
 
 
@@ -138,6 +143,7 @@ class Component:
         cost_estimate: Estimated cost
         embedding_id: Reference to vector embedding
     """
+
     id: str
     type: ComponentType
     name: str
@@ -150,10 +156,10 @@ class Component:
     cost_estimate: Optional[float] = None
     embedding_id: Optional[str] = None
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary"""
         data = asdict(self)
-        data['type'] = self.type.value
+        data["type"] = self.type.value
         return data
 
 
@@ -174,6 +180,7 @@ class Room:
         finish_schedule: Reference to finish schedule
         embedding_id: Reference to vector embedding
     """
+
     id: str
     number: str
     name: str
@@ -185,7 +192,7 @@ class Room:
     finish_schedule: Optional[str] = None
     embedding_id: Optional[str] = None
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary"""
         return asdict(self)
 
@@ -207,6 +214,7 @@ class Decision:
         schedule_impact: Days added/removed
         embedding_id: Reference to vector embedding
     """
+
     id: str
     type: str  # design_change, rfi_response, change_order, clarification
     date: datetime
@@ -218,10 +226,10 @@ class Decision:
     schedule_impact: Optional[int] = None  # days
     embedding_id: Optional[str] = None
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary with datetime serialization"""
         data = asdict(self)
-        data['date'] = self.date.isoformat()
+        data["date"] = self.date.isoformat()
         return data
 
 
@@ -240,6 +248,7 @@ class Person:
         discipline: Primary discipline (A, S, M, E, P, C)
         active: Currently on project?
     """
+
     id: str
     name: str
     role: str
@@ -249,7 +258,7 @@ class Person:
     discipline: Optional[str] = None
     active: bool = True
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary"""
         return asdict(self)
 
@@ -269,6 +278,7 @@ class Requirement:
         applies_to: What it applies to (e.g., "fire_walls")
         embedding_id: Reference to vector embedding
     """
+
     id: str
     type: str  # code, standard, spec, owner_requirement
     source: str
@@ -278,7 +288,7 @@ class Requirement:
     applies_to: Optional[str] = None
     embedding_id: Optional[str] = None
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary"""
         return asdict(self)
 
@@ -297,6 +307,7 @@ class Milestone:
         percentage_complete: 0-100
         description: Description
     """
+
     id: str
     name: str
     abbreviation: str
@@ -305,10 +316,10 @@ class Milestone:
     percentage_complete: float = 0.0
     description: Optional[str] = None
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary with datetime serialization"""
         data = asdict(self)
-        data['date'] = self.date.isoformat()
+        data["date"] = self.date.isoformat()
         return data
 
 
@@ -316,29 +327,32 @@ class Milestone:
 # Relationship Classes (Edges)
 # =============================================================================
 
+
 @dataclass
 class Supersedes:
     """Newer drawing supersedes older drawing"""
+
     date: datetime
     reason: str
     changes_summary: str
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary with datetime serialization"""
         data = asdict(self)
-        data['date'] = self.date.isoformat()
+        data["date"] = self.date.isoformat()
         return data
 
 
 @dataclass
 class Affects:
     """One drawing affects another"""
+
     impact_type: str  # coordination, conflict, dependency
     severity: str  # minor, moderate, major
     description: str
     resolved: bool = False
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary"""
         return asdict(self)
 
@@ -346,11 +360,12 @@ class Affects:
 @dataclass
 class Contains:
     """Drawing contains component"""
+
     quantity: Optional[float] = None
     detail_reference: Optional[str] = None
     note: Optional[str] = None
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary"""
         return asdict(self)
 
@@ -358,10 +373,11 @@ class Contains:
 @dataclass
 class LocatedIn:
     """Component located in room"""
+
     quantity: Optional[float] = None
     installation_notes: Optional[str] = None
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary"""
         return asdict(self)
 
@@ -369,11 +385,12 @@ class LocatedIn:
 @dataclass
 class Requires:
     """Component requires a requirement"""
+
     compliance_status: str  # compliant, non_compliant, under_review
     verification_method: Optional[str] = None
     verified_by: Optional[str] = None
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary"""
         return asdict(self)
 
@@ -381,38 +398,41 @@ class Requires:
 @dataclass
 class ApprovedBy:
     """Decision/Drawing approved by person"""
+
     date: datetime
     signature_path: Optional[str] = None
     comments: Optional[str] = None
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary with datetime serialization"""
         data = asdict(self)
-        data['date'] = self.date.isoformat()
+        data["date"] = self.date.isoformat()
         return data
 
 
 @dataclass
 class MadeBy:
     """Decision made by person"""
+
     date: datetime
     rationale: Optional[str] = None
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary with datetime serialization"""
         data = asdict(self)
-        data['date'] = self.date.isoformat()
+        data["date"] = self.date.isoformat()
         return data
 
 
 @dataclass
 class Modifies:
     """Decision modifies component/drawing"""
+
     change_type: str  # addition, deletion, modification
     before_state: Optional[str] = None
     after_state: Optional[str] = None
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary"""
         return asdict(self)
 
@@ -420,11 +440,12 @@ class Modifies:
 @dataclass
 class References:
     """Drawing references another drawing"""
+
     reference_type: str  # detail, section, elevation, plan
     sheet_reference: Optional[str] = None
     note: Optional[str] = None
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary"""
         return asdict(self)
 
@@ -432,14 +453,15 @@ class References:
 @dataclass
 class SubmittedAt:
     """Drawing submitted at milestone"""
+
     date: datetime
     review_status: str  # approved, approved_with_comments, resubmit
     comments_path: Optional[str] = None
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary with datetime serialization"""
         data = asdict(self)
-        data['date'] = self.date.isoformat()
+        data["date"] = self.date.isoformat()
         return data
 
 

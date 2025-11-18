@@ -5,10 +5,11 @@ Extracts text and metadata from PDF files (technical specs, drawings, etc.).
 Uses PyMuPDF (fitz) for parsing and optional OCR for scanned documents.
 """
 
-from typing import Dict, Any, List, Optional
-from pathlib import Path
-import structlog
 from dataclasses import dataclass
+from pathlib import Path
+from typing import Any, Optional
+
+import structlog
 
 logger = structlog.get_logger(__name__)
 
@@ -27,7 +28,7 @@ class PDFMetadata:
     creation_date: Optional[str] = None
     modification_date: Optional[str] = None
     page_count: int = 0
-    text_content: List[str] = None
+    text_content: list[str] = None
     has_images: bool = False
 
     def __post_init__(self):
@@ -180,7 +181,7 @@ class PDFParser:
 
     def chunk_by_pages(
         self, metadata: PDFMetadata, pages_per_chunk: int = 1
-    ) -> List[Dict[str, Any]]:
+    ) -> list[dict[str, Any]]:
         """
         Chunk PDF by pages.
 

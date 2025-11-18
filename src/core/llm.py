@@ -6,10 +6,12 @@ Provides prompt templating, streaming, and token usage tracking.
 """
 
 import asyncio
-from typing import List, Optional, Dict, Any, AsyncGenerator
+from collections.abc import AsyncGenerator
 from dataclasses import dataclass
-import structlog
 from enum import Enum
+from typing import Optional
+
+import structlog
 
 logger = structlog.get_logger(__name__)
 
@@ -250,7 +252,7 @@ class OllamaLLM:
     async def generate_with_context(
         self,
         question: str,
-        context_chunks: List[str],
+        context_chunks: list[str],
         template: PromptTemplate = PromptTemplate.FACTUAL,
         max_context_tokens: int = 2048,
     ) -> str:
@@ -289,7 +291,7 @@ class OllamaLLM:
 
         return answer
 
-    def get_token_usage(self) -> Dict[str, int]:
+    def get_token_usage(self) -> dict[str, int]:
         """
         Get cumulative token usage.
 
@@ -327,7 +329,13 @@ async def classify_query_intent(llm: OllamaLLM, question: str) -> str:
     intent = result.strip().split("\n")[0].strip().lower()
 
     # Validate intent
-    valid_intents = ["factual", "impact_analysis", "version_comparison", "code_compliance", "multi_hop"]
+    valid_intents = [
+        "factual",
+        "impact_analysis",
+        "version_comparison",
+        "code_compliance",
+        "multi_hop",
+    ]
     for valid in valid_intents:
         if valid in intent:
             return valid
@@ -367,7 +375,9 @@ if __name__ == "__main__":
         print(f"Answer: {answer}\n")
 
         # Test query classification
-        intent = await classify_query_intent(llm, "What drawings are affected by the lobby expansion?")
+        intent = await classify_query_intent(
+            llm, "What drawings are affected by the lobby expansion?"
+        )
         print(f"Query intent: {intent}\n")
 
         # Token usage

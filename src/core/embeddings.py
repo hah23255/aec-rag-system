@@ -6,13 +6,13 @@ Provides caching, batch processing, and VRAM monitoring.
 """
 
 import asyncio
-from typing import List, Optional, Dict, Any
-import numpy as np
-from dataclasses import dataclass
-import structlog
 import hashlib
-import json
+from dataclasses import dataclass
 from pathlib import Path
+from typing import Any, Optional
+
+import numpy as np
+import structlog
 
 logger = structlog.get_logger(__name__)
 
@@ -20,6 +20,7 @@ logger = structlog.get_logger(__name__)
 @dataclass
 class EmbeddingConfig:
     """Configuration for embedding generation"""
+
     model_name: str = "nomic-embed-text"
     ollama_base_url: str = "http://localhost:11434"
     embedding_dim: int = 768
@@ -134,7 +135,7 @@ class OllamaEmbeddingGenerator:
             logger.error("Failed to generate embedding", error=str(e), text_length=len(text))
             raise
 
-    async def embed_batch(self, texts: List[str]) -> List[np.ndarray]:
+    async def embed_batch(self, texts: list[str]) -> list[np.ndarray]:
         """
         Generate embeddings for multiple texts in batches.
 
@@ -144,7 +145,7 @@ class OllamaEmbeddingGenerator:
         Returns:
             List of embedding vectors
         """
-        embeddings: List[np.ndarray] = []
+        embeddings: list[np.ndarray] = []
 
         # Process in batches
         for i in range(0, len(texts), self.config.batch_size):
@@ -190,7 +191,7 @@ class OllamaEmbeddingGenerator:
         logger.info("Cleared embedding cache", files_removed=count)
         return count
 
-    def get_cache_stats(self) -> Dict[str, Any]:
+    def get_cache_stats(self) -> dict[str, Any]:
         """
         Get cache statistics.
 
@@ -231,9 +232,9 @@ def cosine_similarity(embedding1: np.ndarray, embedding2: np.ndarray) -> float:
 
 def find_most_similar(
     query_embedding: np.ndarray,
-    embeddings: List[np.ndarray],
+    embeddings: list[np.ndarray],
     top_k: int = 5,
-) -> List[tuple[int, float]]:
+) -> list[tuple[int, float]]:
     """
     Find most similar embeddings to query.
 
