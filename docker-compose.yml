@@ -1,0 +1,138 @@
+# AEC Design Management RAG System - Docker Compose
+# Orchestrates all services: API, Ollama, Vector DB
+
+version: '3.8'
+
+services:
+  # ============================================================================
+  # Ollama Service (Local LLM & Embeddings)
+  # ============================================================================
+  ollama:
+    image: ollama/ollama:latest
+    container_name: aec-rag-ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    environment:
+      - OLLAMA_HOST=0.0.0.0
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    restart: unless-stopped
+    networks:
+      - aec-rag-network
+
+  # ============================================================================
+  # AEC RAG API Service
+  # ============================================================================
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: aec-rag-api
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
+      - ./config:/app/config:ro
+    environment:
+      - OLLAMA_BASE_URL=http://ollama:11434
+      - VECTOR_DB_TYPE=chromadb
+      - CHROMA_PERSIST_DIR=/app/data/chroma_db
+      - GRAPHRAG_WORKING_DIR=/app/data/graphrag
+      - LOG_LEVEL=INFO
+    depends_on:
+      - ollama
+    restart: unless-stopped
+    networks:
+      - aec-rag-network
+
+  # ============================================================================
+  # ChromaDB (Optional - Embedded mode works too)
+  # ============================================================================
+  # chromadb:
+  #   image: chromadb/chroma:latest
+  #   container_name: aec-rag-chromadb
+  #   ports:
+  #     - "8001:8000"
+  #   volumes:
+  #     - chroma_data:/chroma/chroma
+  #   environment:
+  #     - IS_PERSISTENT=TRUE
+  #     - ANONYMIZED_TELEMETRY=FALSE
+  #   restart: unless-stopped
+  #   networks:
+  #     - aec-rag-network
+
+  # ============================================================================
+  # Milvus (Production Vector DB - Optional)
+  # ============================================================================
+  # Uncomment for production-grade vector database
+  # milvus-etcd:
+  #   image: quay.io/coreos/etcd:v3.5.5
+  #   container_name: aec-rag-milvus-etcd
+  #   environment:
+  #     - ETCD_AUTO_COMPACTION_MODE=revision
+  #     - ETCD_AUTO_COMPACTION_RETENTION=1000
+  #     - ETCD_QUOTA_BACKEND_BYTES=4294967296
+  #     - ETCD_SNAPSHOT_COUNT=50000
+  #   volumes:
+  #     - milvus_etcd:/etcd
+  #   networks:
+  #     - aec-rag-network
+  #
+  # milvus-minio:
+  #   image: minio/minio:RELEASE.2023-03-20T20-16-18Z
+  #   container_name: aec-rag-milvus-minio
+  #   environment:
+  #     MINIO_ACCESS_KEY: minioadmin
+  #     MINIO_SECRET_KEY: minioadmin
+  #   ports:
+  #     - "9001:9001"
+  #     - "9000:9000"
+  #   volumes:
+  #     - milvus_minio:/minio_data
+  #   command: minio server /minio_data --console-address ":9001"
+  #   healthcheck:
+  #     test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+  #     interval: 30s
+  #     timeout: 20s
+  #     retries: 3
+  #   networks:
+  #     - aec-rag-network
+  #
+  # milvus-standalone:
+  #   image: milvusdb/milvus:v2.3.3
+  #   container_name: aec-rag-milvus
+  #   security_opt:
+  #     - seccomp:unconfined
+  #   environment:
+  #     ETCD_ENDPOINTS: milvus-etcd:2379
+  #     MINIO_ADDRESS: milvus-minio:9000
+  #   ports:
+  #     - "19530:19530"
+  #     - "9091:9091"
+  #   volumes:
+  #     - milvus_data:/var/lib/milvus
+  #   depends_on:
+  #     - milvus-etcd
+  #     - milvus-minio
+  #   networks:
+  #     - aec-rag-network
+
+networks:
+  aec-rag-network:
+    driver: bridge
+
+volumes:
+  ollama_data:
+  chroma_data:
+  # milvus_data:
+  # milvus_etcd:
+  # milvus_minio:
