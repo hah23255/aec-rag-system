@@ -10,7 +10,7 @@ readme = "README.md"
 requires-python = ">=3.9"
 license = {text = "MIT"}
 authors = [
-    {name = "Your Name", email = "your.email@example.com"}
+    {name = "hah23255", email = "your.email@example.com"}
 ]
 keywords = ["RAG", "AEC", "GraphRAG", "LLM", "CAD", "architecture"]
 classifiers = [
@@ -24,10 +24,10 @@ classifiers = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/yourusername/aec-rag-system"
-Documentation = "https://github.com/yourusername/aec-rag-system/docs"
-Repository = "https://github.com/yourusername/aec-rag-system"
-Issues = "https://github.com/yourusername/aec-rag-system/issues"
+Homepage = "https://github.com/hah23255/aec-rag-system"
+Documentation = "https://github.com/hah23255/aec-rag-system/tree/main/docs"
+Repository = "https://github.com/hah23255/aec-rag-system"
+Issues = "https://github.com/hah23255/aec-rag-system/issues"
 
 # =============================================================================
 # Tool Configurations
@@ -54,6 +54,8 @@ extend-exclude = '''
 [tool.ruff]
 line-length = 100
 target-version = "py39"
+
+[tool.ruff.lint]
 select = [
     "E",  # pycodestyle errors
     "W",  # pycodestyle warnings
@@ -67,6 +69,7 @@ ignore = [
     "E501",  # line too long (handled by black)
     "B008",  # do not perform function calls in argument defaults
     "C901",  # too complex
+    "B904",  # raise from exception
 ]
 exclude = [
     ".bzr",
