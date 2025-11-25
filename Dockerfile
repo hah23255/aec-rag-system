@@ -47,8 +47,8 @@ USER aecuser
 
 # Copy application code
 COPY --chown=aecuser:aecuser src/ ./src/
-COPY --chown=aecuser:aecuser config/ ./config/
-COPY --chown=aecuser:aecuser scripts/ ./scripts/
+# COPY --chown=aecuser:aecuser config/ ./config/  # Directory not present
+# COPY --chown=aecuser:aecuser scripts/ ./scripts/  # Directory not present
 COPY --chown=aecuser:aecuser .env.example ./
 
 # Create data directories
